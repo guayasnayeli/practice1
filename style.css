@@ -1,21 +1,37 @@
-#gridContainer {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 12px;
+/* Basic page style */
+body {
+  font-family: Arial;
+  padding: 20px;
 }
 
-.tile {
-  border: 1px solid #aaa;
+/* Inputs and buttons */
+input, button {
   padding: 8px;
+  margin: 5px;
+}
+
+/* Grid container for results */
+#results {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+
+/* Card style */
+.tile {
+  border: 1px solid #ccc;
+  padding: 10px;
   cursor: pointer;
 }
 
+/* Image inside card */
 .tile img {
   width: 100%;
 }
 
+/* Responsive layout */
 @media (max-width: 800px) {
-  #gridContainer {
+  #results {
     grid-template-columns: repeat(2, 1fr);
   }
 }

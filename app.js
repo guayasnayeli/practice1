@@ -1,79 +1,128 @@
 /* ---------- LOGIN ---------- */
+
+// Handles login button click
 function handleAccess() {
-  const u = document.getElementById("username").value;
-  const p = document.getElementById("password").value;
+  const user = document.getElementById("username").value;
+  const pass = document.getElementById("password").value;
 
-  if (!u || !p) return;
+  // Simple validation (not empty)
+  if (!user || !pass) {
+    alert("Please enter user and password");
+    return;
+  }
 
-  sessionStorage.setItem("sessionActive", "1");
+  // Save session flag
+  sessionStorage.setItem("sessionActive", "true");
 
-  window.location.assign("search.html");
-
+  // Redirect to search page
+  window.location = "search.html";
 }
 
 /* ---------- SEARCH ---------- */
-async function runsearch() {
-  const term = document.getElementById("searchInput").value;
 
-  if (!term) return;
+// Fetch data from API
+async function runSearch() {
+  const input = document.getElementById("searchInput").value;
 
-  const response = await fetch(`https://api.tvmaze.com/search/shows?q=${term}`);
-  const payload = await response.json();
+  if (!input) {
+    alert("Write something");
+    return;
+  }
 
-  // Save data for detail page
-  sessionStorage.setItem("cacheList", JSON.stringify(payload));
+  // Call API
+  const res = await fetch(`https://api.tvmaze.com/search/shows?q=${input}`);
+  const data = await res.json();
 
-  drawGrid(payload);
+  // Save results and query
+  sessionStorage.setItem("data", JSON.stringify(data));
+  sessionStorage.setItem("query", input);
+
+  // Render results
+  showResults(data);
 }
 
-function drawGrid(list) {
-  const root = document.getElementById("gridContainer");
-  root.innerHTML = "";
+/* ---------- RENDER RESULTS ---------- */
 
-  list.forEach((entry, i) => {
-    const item = entry.show;
+// Display cards on screen
+function showResults(list) {
+  const container = document.getElementById("results");
+  container.innerHTML = "";
 
-    const box = document.createElement("div");
-    box.classList.add("tile");
+  for (let i = 0; i < list.length; i++) {
+    const show = list[i].show;
 
-    box.innerHTML = `
-      <img src="${item.image ? item.image.medium : ''}">
-      <p>${item.name}</p>
+    const card = document.createElement("div");
+    card.className = "tile";
+
+    // Clean short description
+    let desc = "No description";
+    if (show.summary) {
+      desc = show.summary.replace(/<[^>]+>/g, "").substring(0, 80);
+    }
+
+    // Card content
+    card.innerHTML = `
+      <img src="${show.image ? show.image.medium : ''}">
+      <h4>${show.name}</h4>
+      <p>${desc}...</p>
     `;
 
-    box.addEventListener("click", () => openPreview(i));
+    // Click → go to detail
+    card.onclick = function () {
+      sessionStorage.setItem("index", i);
+      window.location = "detail.html";
+    };
 
-    root.appendChild(box);
-  });
+    container.appendChild(card);
+  }
 }
 
-function openPreview(pos) {
-  sessionStorage.setItem("focusItem", pos);
-  window.location.assign("preview.html");
-}
+/* ---------- RESTORE SEARCH ---------- */
 
-/* --------- DETAIL ---------- */
-function loadPreview() {
-  const raw = sessionStorage.getItem("cacheList");
-  const idx = sessionStorage.getItem("focusItem");
+// Restore data when returning from detail page
+window.onload = function () {
 
-  if (!raw || idx === null) return;
+  // If we are in search page
+  if (document.getElementById("results")) {
+    const savedData = sessionStorage.getItem("data");
+    const savedQuery = sessionStorage.getItem("query");
 
-  const parsed = JSON.parse(raw);
-  const selected = parsed[idx].show;
+    if (savedQuery) {
+      document.getElementById("searchInput").value = savedQuery;
+    }
+
+    if (savedData) {
+      showResults(JSON.parse(savedData));
+    }
+  }
+
+  // If we are in detail page
+  if (document.getElementById("viewer")) {
+    loadDetail();
+  }
+};
+
+/* ---------- DETAIL ---------- */
+
+// Load selected item
+function loadDetail() {
+  const data = JSON.parse(sessionStorage.getItem("data"));
+  const index = sessionStorage.getItem("index");
+
+  if (!data) return;
+
+  const show = data[index].show;
 
   document.getElementById("viewer").innerHTML = `
-    <h2>${selected.name}</h2>
-    <img src="${selected.image ? selected.image.original : ''}">
-    <div>${selected.summary}</div>
+    <h2>${show.name}</h2>
+    <img src="${show.image ? show.image.original : ''}">
+    <p>${show.summary}</p>
   `;
 }
 
-/* Run only in detail page */
-if (document.getElementById("viewer")) {
-  loadPreview();
-}
+/* ---------- BACK ---------- */
 
+// Go back to search page
 function returnToList() {
-  window.location.assign("detail.html");
+  window.location = "search.html";
 }

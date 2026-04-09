@@ -52,4 +52,19 @@ function openPreview(pos) {
   window.location.assign("preview.html");
 }
 
+/* --------- DETAIL ---------- */
+function loadPreview() {
+  const raw = sessionStorage.getItem("cacheList");
+  const idx = sessionStorage.getItem("focusItem");
 
+  if (!raw || idx === null) return;
+
+  const parsed = JSON.parse(raw);
+  const selected = parsed[idx].show;
+
+  document.getElementById("viewer").innerHTML = `
+    <h2>${selected.name}</h2>
+    <img src="${selected.image ? selected.image.original : ''}">
+    <div>${selected.summary}</div>
+  `;
+}

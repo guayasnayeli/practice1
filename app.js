@@ -46,3 +46,10 @@ function drawGrid(list) {
     root.appendChild(box);
   });
 }
+
+function openPreview(pos) {
+  sessionStorage.setItem("focusItem", pos);
+  window.location.assign("preview.html");
+}
+
+

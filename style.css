@@ -1,0 +1,21 @@
+#gridContainer {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+}
+
+.tile {
+  border: 1px solid #aaa;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.tile img {
+  width: 100%;
+}
+
+@media (max-width: 800px) {
+  #gridContainer {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

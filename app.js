@@ -73,3 +73,7 @@ function loadPreview() {
 if (document.getElementById("viewer")) {
   loadPreview();
 }
+
+function returnToList() {
+  window.location.assign("detail.html");
+}

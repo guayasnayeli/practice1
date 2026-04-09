@@ -26,52 +26,23 @@ async function runsearch() {
   drawGrid(payload);
 }
 
-function renderCards(data) {
-  const container = document.getElementById("results");
-  container.innerHTML = "";
+function drawGrid(list) {
+  const root = document.getElementById("gridContainer");
+  root.innerHTML = "";
 
-  data.forEach((item, index) => {
-    const show = item.show;
+  list.forEach((entry, i) => {
+    const item = entry.show;
 
-    const card = document.createElement("div");
-    card.className = "card";
+    const box = document.createElement("div");
+    box.classList.add("tile");
 
-    card.innerHTML = `
-      <img src="${show.image ? show.image.medium : ''}">
-      <h4>${show.name}</h4>
+    box.innerHTML = `
+      <img src="${item.image ? item.image.medium : ''}">
+      <p>${item.name}</p>
     `;
 
-    card.onclick = () => {
-      localStorage.setItem("selectedIndex", index);
-      window.location.href = "detail.html";
-    };
+    box.addEventListener("click", () => openPreview(i));
 
-    container.appendChild(card);
+    root.appendChild(box);
   });
-}
-
-/* ---------- DETAIL ---------- */
-function loadDetail() {
-  const data = JSON.parse(localStorage.getItem("data"));
-  const index = localStorage.getItem("selectedIndex");
-
-  if (!data || index === null) return;
-
-  const show = data[index].show;
-
-  document.getElementById("detail").innerHTML = `
-    <h2>${show.name}</h2>
-    <img src="${show.image ? show.image.original : ''}">
-    <p>${show.summary}</p>
-  `;
-}
-
-/* Run only in detail page */
-if (document.getElementById("detail")) {
-  loadDetail();
-}
-
-/* ---------- BACK ---------- */
-function goBack() {
-  window.location.href = "search.html";
 }

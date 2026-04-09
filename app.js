@@ -68,3 +68,8 @@ function loadPreview() {
     <div>${selected.summary}</div>
   `;
 }
+
+/* Run only in detail page */
+if (document.getElementById("viewer")) {
+  loadPreview();
+}
